@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Eslear{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow">YOUR PERSONAL STUDY SPACE</div>
+  <h1>Turn long reading into <span>clear ideas.</span></h1>
+  <p>Upload PDF notes or paste an article, newspaper story, or class notes. Eslear extracts key points and creates revision flashcards.</p>
+</section>
+<section class="panel">
+  <div class="section-heading"><div><h2>Create a summary</h2><p>Use a text-based PDF, TXT, or Markdown file, or paste text below.</p></div><span class="pill">20 MB max</span></div>
+  <form action="{{ url_for('summarize') }}" method="post" enctype="multipart/form-data" class="upload-form">
+    <label for="title">Title <span class="muted">(optional)</span></label>
+    <input id="title" name="title" type="text" maxlength="160" placeholder="e.g. Chapter 3 — Photosynthesis">
+    <label for="file">Upload a file</label>
+    <div class="dropzone" id="dropzone">
+      <div class="upload-icon">↑</div><strong>Choose a file to upload</strong>
+      <p>PDF, TXT, or MD · Text-based PDFs work best</p>
+      <input id="file" name="file" type="file" accept=".pdf,.txt,.md">
+      <div id="file-name" class="file-name">No file selected</div>
+    </div>
+    <div class="or-divider"><span>OR PASTE TEXT</span></div>
+    <label for="article_text">Article, notes, or newspaper text</label>
+    <textarea id="article_text" name="article_text" rows="7" placeholder="Paste the reading material here…"></textarea>
+    <div class="form-footer"><small>At least 80 characters are required. Review generated points for accuracy.</small><button class="button primary" type="submit">Generate key points <span>→</span></button></div>
+  </form>
+</section>
+<section id="how-it-works" class="steps">
+  <div><span>01</span><h3>Add your reading</h3><p>Upload a document or paste text from an article or newspaper.</p></div>
+  <div><span>02</span><h3>Extract ideas</h3><p>A lightweight extractive algorithm ranks important sentences.</p></div>
+  <div><span>03</span><h3>Revise & save</h3><p>Study flashcards, listen with speech, and save personal notes.</p></div>
+</section>
+<section class="library">
+  <div class="section-heading"><div><h2>Your library</h2><p>Saved summaries and study material</p></div><span class="count">{{ documents|length }} saved</span></div>
+  {% if documents %}
+  <div class="document-list">
+    {% for doc in documents %}
+    <a class="document-row" href="{{ url_for('view_summary', doc_id=doc.id) }}">
+      <span class="doc-icon">{% if doc.source_type == 'pdf' %}PDF{% else %}TXT{% endif %}</span>
+      <span class="doc-info"><strong>{{ doc.title }}</strong><small>{{ doc.source_name }} · {{ doc.created_at }}</small></span>
+      <span class="arrow">↗</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty"><div>▤</div><strong>Your library is empty</strong><p>Your first summary will appear here.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

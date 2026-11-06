@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ doc.title }} · Eslear{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('index') }}">← Back to dashboard</a>
+<section class="summary-head">
+  <div class="eyebrow">YOUR STUDY SUMMARY</div><h1>{{ doc.title }}</h1>
+  <p>{{ doc.source_name }} · Created {{ doc.created_at }}</p>
+  <div class="action-row"><button class="button secondary" id="speak-summary" data-text="{{ doc.summary|e }}">▶ Read summary aloud</button><button class="button secondary" id="stop-speech">■ Stop audio</button><button class="button secondary" id="download-summary">↓ Download .txt</button></div>
+</section>
+<div class="content-grid">
+  <section class="panel main-panel">
+    <div class="section-heading"><div><h2>Important points</h2><p>Ranked sentences extracted from your reading</p></div><span class="pill">{{ key_points|length }} points</span></div>
+    <ol class="key-points">{% for point in key_points %}<li><span class="point-number">{{ "%02d"|format(loop.index) }}</span><p>{{ point }}</p></li>{% endfor %}</ol>
+    <div class="section-heading flash-heading"><div><h2>Revision flashcards</h2><p>Click a card to reveal the answer</p></div></div>
+    <div class="flashcard-wrap">
+      {% for card in flashcards %}
+      <button type="button" class="flashcard" aria-pressed="false"><span class="card-label">FLASHCARD {{ "%02d"|format(loop.index) }}</span><span class="card-question">{{ card.question }}</span><span class="card-answer">{{ card.answer }}</span><span class="flip-hint">Click to flip ↻</span></button>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="side-column">
+    <section class="panel"><h2>Your notes</h2><p class="muted">Save reminders or questions for later.</p>
+      <form action="{{ url_for('save_notes', doc_id=doc.id) }}" method="post"><textarea name="notes" rows="7" placeholder="Write your notes here…">{{ doc.notes }}</textarea><button class="button primary full" type="submit">Save notes</button></form>
+    </section>
+    <section class="panel"><h2>Original text</h2><p class="muted">Extracted source text, for comparison</p><details><summary>Show full text</summary><div class="original-text">{{ doc.original_text }}</div></details></section>
+    <form action="{{ url_for('delete_summary', doc_id=doc.id) }}" method="post" onsubmit="return confirm('Delete this saved summary?')"><button class="button danger full" type="submit">Delete summary</button></form>
+  </aside>
+</div>
+<script type="application/json" id="download-data">{{ {"title": doc.title, "summary": doc.summary, "points": key_points, "notes": doc.notes}|tojson }}</script>
+{% endblock %}
